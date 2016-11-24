@@ -369,8 +369,8 @@ if __name__ == "__main__":
 	    		board = MultiWii(FLIGHT)
 	    		t_flight = Thread(target=Accelerometer, args=(board,))
 	    		t_flight_G = Thread(target=GPS, args=(board,))
-			# t_flight.start()
-			# t_flight_G.start()
+			t_flight.start()
+			t_flight_G.start()
 		except Exception,e: 
 			print 'ERROR : '+str(e)
 
@@ -382,9 +382,9 @@ if __name__ == "__main__":
 		# ------------Start Main Threads-------------------------
 		try:
 
-		   # t_bat = Thread(target=read_battery, args=(BATTERY,9600))
+		   t_bat = Thread(target=read_battery, args=(BATTERY,9600))
 		   t_can = Thread(target=read_can, args=(CAN,115200))
-		   # t_bat.start()
+		   t_bat.start()
 		   t_can.start()
 
 		   count=0

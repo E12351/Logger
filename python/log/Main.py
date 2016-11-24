@@ -91,8 +91,8 @@ class Main(object):
 				t_can.start()
 
 				bat.path_can	= BATTERY
-				# t_bat = Thread(target=bat_obj.read_battery, args=())
-				# t_bat.start()
+				t_bat = Thread(target=bat_obj.read_battery, args=())
+				t_bat.start()
 
 			except Exception,e: 
 				print 'ERROR : '+str(e)

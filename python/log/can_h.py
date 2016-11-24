@@ -25,7 +25,7 @@ class can(object):
 
 		self.path_can
 
-		d_obj = data_H()
+		d_obj_c = data_H()
 
 		data_H.CVS_name_bat	= data_H.CVS_name_can  
 
@@ -74,7 +74,7 @@ class can(object):
 
 			# data_H.csv_writer(csv_write_can.split(','), data_H.CVS_name_can)
 
-			data_H.csv_writer(d_obj)
+			data_H.csv_writer(d_obj_c)
 
 			data_H.lock.acquire()
 			if data_H.q.full():
