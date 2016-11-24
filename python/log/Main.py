@@ -33,10 +33,10 @@ class Main(object):
 		bat_obj		=	bat()
 		
 
-		XBEE = "/dev/ttyUSB0"
+		XBEE 	= "/dev/ttyUSB0"
 		BATTERY = "/dev/ttyUSB0"
-		CAN = "/dev/ttyUSB0"
-		FLIGHT = "/dev/ttyUSB0"
+		CAN 	= "/dev/ttyUSB0"
+		FLIGHT 	= "/dev/ttyUSB0"
 		path_can = "/dev/ttyUSB0"
 
 		try:
@@ -84,18 +84,24 @@ class Main(object):
 		    		t_flight_G = Thread(target=flight_obj.GPS, args=())
 				t_flight.start()
 				t_flight_G.start()
+			except Exception,e: 
+				print 'ERROR t_flight : '+str(e)
 
+			try:
 				can.path_can 	= CAN
 
 				t_can = Thread(target=can_obj.read_can, args=())
 				t_can.start()
+			except Exception,e: 
+				print 'ERROR t_can : '+str(e)
 
+			try:
 				bat.path_can	= BATTERY
 				t_bat = Thread(target=bat_obj.read_battery, args=())
 				t_bat.start()
 
 			except Exception,e: 
-				print 'ERROR : '+str(e)
+				print 'ERROR t_bat : '+str(e)
 
 			print 'Pass'
 			# ----------------Run and print--------------------

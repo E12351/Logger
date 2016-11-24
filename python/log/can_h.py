@@ -25,9 +25,9 @@ class can(object):
 
 		self.path_can
 
-		d_obj_c = data_H()
+		d_obj_c = data_H("",data_H.CVS_name_can)
 
-		data_H.CVS_name_bat	= data_H.CVS_name_can  
+		# data_H.CVS_name_bat	= data_H.CVS_name_can  
 
 		data_raw2		= ''  
 		ser_can 		= serial.Serial(self.path_can,115200, timeout=2, xonxoff=True, rtscts=True, dsrdtr=False) #Tried with and without the last 3 parameters, and also at 1Mbps, same happens.
@@ -39,6 +39,7 @@ class can(object):
 
 			# for x in xrange(1,len(data_raw2)):
 			# 	print data_raw2[0:2]
+
 			self.send_C = ''
 			if (data_raw2[0:6] == 'ID: BB') :
 				# print str(data_raw2[23:25])
@@ -70,7 +71,9 @@ class can(object):
 			time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 			csv_write_can = time+' ' + str(data_raw2)	
 
-			data_H.data = csv_write_can.split(',')
+			d_obj_c.data = csv_write_can.split(',')
+
+			# print str(d_obj_c.data)
 
 			# data_H.csv_writer(csv_write_can.split(','), data_H.CVS_name_can)
 

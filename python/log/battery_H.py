@@ -24,8 +24,8 @@ class bat(object):
 	def read_battery(self):
 
 		self.path_can
-		d_obj = data_H()
-		data_H.CVS_name_bat	= data_H.CVS_name_bat_1_vol  
+		d_obj_b = data_H("",data_H.CVS_name_bat_1_vol)
+		# data_H.CVS_name_bat	= data_H.CVS_name_bat_1_vol  
 
 		ser_batt = serial.Serial(self.path_can, 9600, timeout=2, xonxoff=True, rtscts=True, dsrdtr=False) #Tried with and without the last 3 parameters, and also at 1Mbps, same happens.
 		ser_batt.flushInput()
@@ -70,12 +70,12 @@ class bat(object):
 						# print str(line)
 						line = 'T,' + line
 						# data_H.data = ''
-						data_H.CVS_name_bat	= data_H.CVS_name_bat_temp  
+						d_obj_b.CVS_name_bat	= data_H.CVS_name_bat_temp  
 
 						csv_write_battery = time1 + str(line)
-						data_H.data = csv_write_battery.split(',')
-						# print str(data_H.data)
-						data_H.csv_writer(d_obj)
+						d_obj_b.data = csv_write_battery.split(',')
+						# print str(d_obj_b.data)
+						data_H.csv_writer(d_obj_b)
 
 						break
 					if x =='\n':
@@ -89,21 +89,21 @@ class bat(object):
 						line = 'B,' + line
 						break
 			#---------------------------------------
-				print no_of_bat
+				# print no_of_bat
 				if no_of_bat == '1':
 					# data_H.data = ''
 					csv_write_battery = time1 + str(line)
-					data_H.CVS_name_bat	= data_H.CVS_name_bat_1_vol
-					data_H.data = csv_write_battery.split(',')
-					data_H.csv_writer(d_obj)
+					d_obj_b.CVS_name_bat	= data_H.CVS_name_bat_1_vol
+					d_obj_b.data = csv_write_battery.split(',')
+					data_H.csv_writer(d_obj_b)
 
 				if no_of_bat == '2':
 
 					# data_H.data = ''
 					csv_write_battery = time1 + str(line)
-					data_H.CVS_name_bat	= data_H.CVS_name_bat_2_vol
-					data_H.data = csv_write_battery.split(',')
-					data_H.csv_writer(d_obj)
+					d_obj_b.CVS_name_bat	= data_H.CVS_name_bat_2_vol
+					d_obj_b.data = csv_write_battery.split(',')
+					data_H.csv_writer(d_obj_b)
 
 				data_H.lock.acquire()
 				if data_H.q.full():

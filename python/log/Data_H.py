@@ -19,12 +19,18 @@ from datetime import datetime
 from threading import Thread
 
 class data_H(object):
+
+	def __init__(self, data ,csv_file):
+		super(data_H, self).__init__()
+		self.data 			= data
+		self.CVS_name_bat 	= csv_file
+
 	time_ = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-	CVS_name_bat_temp =  '/home/vega/Desktop/Logger/python/log/Log/BAT/battery_temp_'+time_+'_.csv'
+	CVS_name_bat_temp  = '/home/vega/Desktop/Logger/python/log/Log/BAT/battery_temp_' +time_+'_.csv'
 	CVS_name_bat_1_vol = '/home/vega/Desktop/Logger/python/log/Log/BAT/battery_1_vol_'+time_+'_.csv'
 	CVS_name_bat_2_vol = '/home/vega/Desktop/Logger/python/log/Log/BAT/battery_2_vol_'+time_+'_.csv'
-	CVS_name_can = 		 '/home/vega/Desktop/Logger/python/log/Log/CAN/can_'+time_+'_.csv'
+	CVS_name_can 	   = '/home/vega/Desktop/Logger/python/log/Log/CAN/can_'		  +time_+'_.csv'
 
 	lock = threading.Lock()
 	q = Queue.Queue(maxsize=10)
