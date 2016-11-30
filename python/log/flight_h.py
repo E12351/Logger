@@ -88,8 +88,8 @@ class FLIGHTBOARD(object) :
 			    if data_H.q.full():
 				data_H.q.get()
 				print 'Data droped XYZ'
-			    else:
-			 	print 'Data added XYZ.'
+			    # else:
+			 	# print 'Data added XYZ.'
 			    data_H.q.put(gps_data)
 			    data_H.lock.release()
 
@@ -122,8 +122,8 @@ class FLIGHTBOARD(object) :
 		        if data_H.q.full():
 				data_H.q.get()
 				print 'Data droped XYZ'
-			else:
-			 	print 'Data added XYZ.'
+			# else:
+			 	# print 'Data added XYZ.'
 		        data_H.q.put(data)
 		        data_H.lock.release()
 

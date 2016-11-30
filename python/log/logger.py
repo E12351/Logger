@@ -35,7 +35,8 @@ q = Queue.Queue()
 
 time_ = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-CVS_name_bat_temp =  '/home/vega/Desktop/Logger/python/log/Log/BAT/battery_temp_'+time_+'_.csv'
+CVS_name_bat_temp_1_vol =  '/home/vega/Desktop/Logger/python/log/Log/BAT/battery_temp_1_'+time_+'_.csv'
+CVS_name_bat_temp_2_vol =  '/home/vega/Desktop/Logger/python/log/Log/BAT/battery_temp_2_'+time_+'_.csv'
 CVS_name_bat_1_vol = '/home/vega/Desktop/Logger/python/log/Log/BAT/battery_1_vol_'+time_+'_.csv'
 CVS_name_bat_2_vol = '/home/vega/Desktop/Logger/python/log/Log/BAT/battery_2_vol_'+time_+'_.csv'
 CVS_name_can = 		 '/home/vega/Desktop/Logger/python/log/Log/CAN/can_'+time_+'_.csv'
@@ -171,6 +172,10 @@ def read_battery(path_can,Boud):
 	ser_batt.flushInput()
 	ser_batt.flushOutput()
 
+	B1T='xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+	B2T='xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+	Current='xx'
+	
 	while True:
 		# start_time = time.time()
 		global data_raw
@@ -198,6 +203,7 @@ def read_battery(path_can,Boud):
 		# 			break
 		#---------------------------------------
 		if x == '#':
+			
 			while True:	
 				x = ser_batt.readline(1)
 
@@ -209,10 +215,26 @@ def read_battery(path_can,Boud):
 				line = line + str(x)
 				if x == '\t':
 					# print str(line)
-					line = 'T,' + line
-					csv_write_battery = time1 + str(line)
-					csv_writer(csv_write_battery.split(','),CVS_name_bat_temp)
+					if line[0] =='$':
+						no_of_bat_TEMP = str(line[3])
+						# print str(no_of_bat_TEMP)
+					else:
+						no_of_bat_TEMP = str(line[1])
+						# print str(no_of_bat_TEMP)
 
+					if no_of_bat_TEMP == '1':
+							line = 'T,'+line
+							B1T=''
+							B1T = line
+							csv_write_battery = time1 + str(line)
+							csv_writer(csv_write_battery.split(','),CVS_name_bat_temp_1_vol)
+
+					if no_of_bat_TEMP == '2':
+							line = 'T,'+line
+							B2T=''
+							B2T = line
+							csv_write_battery = time1 + str(line)
+							csv_writer(csv_write_battery.split(','),CVS_name_bat_temp_2_vol)
 					break
 				if x =='\n':
 					if line[0] =='$':
@@ -222,15 +244,19 @@ def read_battery(path_can,Boud):
 						# print str(line[1])
 						no_of_bat = str(line[1])
 								
-					line = 'B,' + line
+					line = ' B,' + line
 					break
 		#---------------------------------------
-			# print no_of_bat
+			# print str(line)
+			if no_of_bat == '3':
+					# print line[2:7]
+					Current = line
+
 			if no_of_bat == '1':
-				csv_write_battery = time1 + str(line)
+				csv_write_battery = time1 +str(Current)+ str(B1T) + str(line)
 				csv_writer(csv_write_battery.split(','),CVS_name_bat_1_vol)
 			if no_of_bat == '2':
-				csv_write_battery = time1 + str(line)
+				csv_write_battery = time1 +str(Current)+ str(B2T) + str(line)
 				csv_writer(csv_write_battery.split(','),CVS_name_bat_2_vol)
 
 			lock.acquire()
@@ -248,7 +274,7 @@ def read_can(path_can,Boud):
 
 	while True:
 		data_raw2= ser_can.readline()
-
+		# print str(data_raw2)
 		# for x in xrange(1,len(data_raw2)):
 		# 	print data_raw2[0:2]
 		send_C = ''
@@ -276,6 +302,149 @@ def read_can(path_can,Boud):
 
 			send_C ='BC,'+str(xrI)+','+str(xrF)
 
+		if (data_raw2[0:6] == 'ID: C1') :
+			# pass
+			# DCm_trip = int(data_raw2[14:15],16)
+
+			# print data_raw2[14:16] + '---' + data_raw2[17:19]
+
+			L_C =int(data_raw2[14:16],16)
+			DCm_trip_tmp =bin(L_C) #convert into binary
+
+			DCm_trip_len = len(DCm_trip_tmp)
+
+			DCm_trip = DCm_trip_tmp[2:DCm_trip_len]
+
+			lenth1 = 10-DCm_trip_len
+
+			for x in xrange(1,lenth1+1):
+				DCm_trip = '0'+ DCm_trip
+
+			# print 'C1 Trip Events : '+ str(DCm_trip)
+
+			I_C = int(data_raw2[17:19],16)
+			DCm_Data_tmp =bin(I_C)
+			
+
+			DCm_Data_len = len(DCm_Data_tmp)
+			# print DCm_Data_len
+			DCm_Data = DCm_Data_tmp[2:DCm_Data_len]
+
+			lenth2 = 10-DCm_Data_len
+
+			for x in xrange(1,lenth2+1):
+				DCm_Data = '0'+ DCm_Data
+
+			DCm_Data = '0b'+DCm_Data
+			# print str(DCm_Data)
+			
+			#concat all trip events to one string
+			# print DCm_Data
+			# print DCm_trip
+			DCm_trip = DCm_trip + DCm_Data[6:10]
+			# print 'C1 Trip Events : '+ str(DCm_trip)
+
+			if( DCm_Data[2:4] == '10' ):
+				# print int(data_raw2[35:37],16)
+
+				BUS_I_t = data_raw2[20:22]
+				BUS_I_t = data_raw2[23:25]+BUS_I_t
+				
+				BUS_I_f = int(BUS_I_t,16)
+				# print BUS_I_f
+
+				BUS_v1_t = data_raw2[26:28]
+				BUS_v1_t = data_raw2[29:31] + BUS_v1_t
+				
+				BUS_v1_f = int(BUS_v1_t,16)
+				# print BUS_v1_f
+
+				BUS_v2_t = data_raw2[32:34]
+				BUS_v2_t = data_raw2[35:37]+ BUS_v2_t
+				
+				BUS_v2_f = int(BUS_v2_t,16)
+
+				# print 'BUS_I : '+str(BUS_I_t)+' BUS_V1 : '+str(BUS_v1_t)+' BUS_V2 : '+str(BUS_v2_t)
+
+				# print 'BUS_I : '+str(BUS_I_f)+' BUS_V1 : '+str(BUS_v1_f)+' BUS_V2 : '+str(BUS_v2_f)
+
+				send_C = 'C1VI,'+str(BUS_I_f)+','+str(BUS_v1_f)+','+str(BUS_v2_f)+','+DCm_trip+','
+
+			if( DCm_Data[2:4] == '01' ):
+
+				IGBT1 = int(data_raw2[20:22],16)
+				IGBT2 = int(data_raw2[23:25],16)
+				MOTOR_TEMP = int(data_raw2[26:28],16)
+				HEATSINK_TEMP = int(data_raw2[29:31],16)
+				VS = int(data_raw2[32:34],16)
+				IS = int(data_raw2[35:37],16)
+
+				# print 'pass'
+				# print 'IGBT : ' +str(IGBT2)
+
+				send_C ='C1IGBT1,' + str(IGBT1)+','+str(IGBT2)+','+str(MOTOR_TEMP)+','+str(HEATSINK_TEMP)+','+str(VS)+','+str(IS)+','+DCm_trip+','
+
+
+			#-----------------
+			if( DCm_Data[2:4] == '00' ):
+
+				# print'Data Pack : 00'
+				SW_F = int(data_raw2[20:22],16)
+				BUS_I = int(data_raw2[23:25],16)
+				BUS_V1 = int(data_raw2[26:28],16)
+				BUS_V2 = int(data_raw2[29:31],16)
+				MOTOR_PW = int(data_raw2[32:34],16)
+				IGBT0 = int(data_raw2[35:37],16)
+				# print IGBT0
+				send_C ='C1IGBT0,' +str(IGBT0)+','+str(BUS_I)+','+str(BUS_V1)+','+str(BUS_V2)+','+str(MOTOR_PW)+','+DCm_trip+','
+		#------C2----------------------------------
+
+			##############################################
+			# 			if(DCm_Data_len == 10):
+			# 	print'Data Pack : ' + str(DCm_Data[7:9]) + ' expected : 0'
+			# 	if( DCm_Data[3:5] == '10' ):
+			# 		print int(data_raw2[35:37],16)
+
+			# if(DCm_Data_len == 9):
+			# 	print'Data Pack : ' + str(DCm_Data[2]) + ' expected : 1'
+			# 	if( DCm_Data[2] == '1' ):
+			# 		IGBT1 = int(data_raw2[20:22],16)
+			# 		IGBT2 = int(data_raw2[23:25],16)
+			# 		MOTOR_TEMP = int(data_raw2[26:28],16)
+			# 		HEATSINK_TEMP = int(data_raw2[29:31],16)
+			# 		VS = int(data_raw2[32:34],16)
+			# 		IS = int(data_raw2[35:37],16)
+
+			# 		print str(IGBT1) + '	'+str(IGBT2)
+			# 		send_C ='IGBT1,' + str(IGBT1)+','+str(IGBT2)+','+str(MOTOR_TEMP)+','+str(HEATSINK_TEMP)+','+str(VS)+','+str(IS)
+
+
+			# #-----------------
+			# if(DCm_Data_len < 9):
+			# 	print'Data Pack : 00'
+			# 	IGBT0 = int(data_raw2[35:37],16)
+			# 	print IGBT0
+			# 	send_C ='IGBT0,' +str(IGBT0)
+			##############################################
+
+
+			# if( DCm_Data[6:7] ==  ):
+
+			# print DCm_Data[0:5]
+
+
+			# pck = int(DCm_Data[7:8], 2)
+			# print str(pck)
+
+		# else:
+		# 	DCm = bin(data_raw2[14:15])
+
+		# 	if( DCm =='0'):
+		# 		data_raw2[32:33]
+		# 	if(data_raw2[14:15]=='1'):
+		# 	if(data_raw2[14:15]=='2'):
+		# 	send_C = data_raw2
+
 		# data_raw2 = 'C,ID: BB  Data: 00 00 00 AA 01 8A 26 59'
 		# time.sleep(0.5)
 
@@ -292,6 +461,7 @@ def read_can(path_can,Boud):
 			q.get()
 			print 'Data droped : CAN'
 		send_C = 'C,'+send_C
+		# print	 send_C
 		q.put(send_C)
 		# q.put(t)
 		lock.release()
@@ -299,7 +469,7 @@ def read_can(path_can,Boud):
 	    	# print(csv_write_can)
 
 def findPorts(port,boud):
-	ser_batt = serial.Serial(port, boud, timeout=2, xonxoff=False, rtscts=False, dsrdtr=False) #Tried with and without the last 3 parameters, and also at 1Mbps, same happens.
+	ser_batt = serial.Serial(port, boud, timeout=2, xonxoff=False, rtscts=True, dsrdtr=False) #Tried with and without the last 3 parameters, and also at 1Mbps, same happens.
 	ser_batt.flushInput()
 	ser_batt.flushOutput()
 
@@ -382,9 +552,10 @@ if __name__ == "__main__":
 		# ------------Start Main Threads-------------------------
 		try:
 
-		   t_bat = Thread(target=read_battery, args=(BATTERY,9600))
+		   # t_bat = Thread(target=read_battery, args=(BATTERY,9600))
+		   # t_bat = Thread(target=read_battery, args=('/dev/ttyACM0',115200))
 		   t_can = Thread(target=read_can, args=(CAN,115200))
-		   t_bat.start()
+		   # t_bat.start()
 		   t_can.start()
 
 		   count=0
@@ -395,7 +566,7 @@ if __name__ == "__main__":
 		   		x = len(load)
 
 		   		# print "length : "+str(x)+" Size : "+str(sys.getsizeof(q.get()))+" bytes Pht No : "+str(count)+"\n"+ q.get()
-		   		# print q.get()
+		   		q.get()
 
 		   		send = "####,"+str(x)+","+str(count)+","+load+"!!"
 		   		print send

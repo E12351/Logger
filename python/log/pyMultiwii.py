@@ -85,8 +85,8 @@ class MultiWii:
         wakeup = 2
         try:
             self.ser.open()
-            if self.PRINT:
-                print "Waking up board on "+self.ser.port+"..."
+            # if self.PRINT:
+            #     print "Waking up board on "+self.ser.port+"..."
             for i in range(1,wakeup):
                 if self.PRINT:
                     # print wakeup-i
